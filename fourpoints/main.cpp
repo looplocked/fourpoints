@@ -1,8 +1,10 @@
 #include<opencv2\highgui.hpp>
 #include<iostream>
 #include "LineSegmentDetector.h"
+#include "OpenNI.h" 
 using namespace std;
 using namespace cv;
+using namespace openni;
 typedef std::vector<std::pair<double, int> > sortType;
 
 
@@ -11,6 +13,12 @@ typedef std::vector<std::pair<double, int> > sortType;
 //输出 平面角点
 bool findPrimaryAngle(std::vector<cv::Vec4f>& lines);
 bool selectPoints(std::vector<cv::Point>& Points);
+
+void CheckOpenNIError(Status result, string status)
+{
+	if (result != STATUS_OK)
+		cerr << status << " Error: " << OpenNI::getExtendedError() << endl;
+}
 
 int main(int argc, char** argv)
 {
@@ -46,150 +54,203 @@ int main(int argc, char** argv)
 	cv::Mat frame, mask, gray;
 	cv::Mat backframe;
 
-	while (m_capture.grab())
+	Status result = STATUS_OK;
+
+	//OpenNI2 image  
+	VideoFrameRef oniColorImg;
+
+	char key = 0;
+
+	//【1】  
+	// initialize OpenNI2  
+	result = OpenNI::initialize();
+	CheckOpenNIError(result, "initialize context");
+
+	// open device    
+	Device device;
+	result = device.open(openni::ANY_DEVICE);
+
+	//【2】  
+	// create depth stream   
+
+	//【3】  
+	// set depth video mode  
+
+	// create color stream  
+	VideoStream oniColorStream;
+	result = oniColorStream.create(device, openni::SENSOR_COLOR);
+	// set color video mode  
+	VideoMode modeColor;
+	modeColor.setResolution(640, 480);
+	modeColor.setFps(30);
+	modeColor.setPixelFormat(PIXEL_FORMAT_RGB888);
+	oniColorStream.setVideoMode(modeColor);
+
+	//【4】  
+	// set depth and color imge registration mode  
+	if (device.isImageRegistrationModeSupported(IMAGE_REGISTRATION_DEPTH_TO_COLOR))
 	{
-		count++;
-		m_capture >> frame;
+		device.setImageRegistrationMode(IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+	}
+	// start color stream  
+	result = oniColorStream.start();
 
-		if (frame.cols == 0 || frame.rows == 0)
-		{
-			break;
-		}
+	while (key != 27)
+	{
+		if (oniColorStream.readFrame(&oniColorImg) == STATUS_OK) {
+			count++;
+			// m_capture >> frame;
+			cv::Mat frame(oniColorImg.getHeight(), oniColorImg.getWidth(), CV_8UC3, (void*)oniColorImg.getData());
 
-		resize(frame, frame, Size(800, 600));//输入视频调整为800*800大小
-		cvtColor(frame, gray, CV_RGB2GRAY);//图像灰度化
-
-										   //二值化
-		cv::Mat img_binary = gray.clone();
-
-		//图像处理形态学计算
-		threshold(img_binary, img_binary, 240, 255, CV_THRESH_BINARY);
-		cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(16, 16));
-		morphologyEx(img_binary, img_binary, cv::MORPH_OPEN, element);
-
-
-		cv::Mat showbinary = img_binary.clone();
-		cv::resize(showbinary, showbinary, cv::Size(800, 800));
-
-		//寻找合适的联通区域
-		std::vector<std::vector<cv::Point>> contours;
-		cv::findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-
-		int maxArea = 0;
-		cv::Rect r1;
-		CvBox2D r2;
-
-		std::vector<cv::Rect> rects;
-		std::vector<cv::Rect> rects_all;
-		for (int i = 0; i < contours.size(); i++)
-		{
-			maxArea = contours[i].size();
-			r2 = cv::minAreaRect(contours[i]);
-			r1 = cv::boundingRect(contours[i]);
-			rects_all.push_back(r1);
-			if (r1.area()<10000 || r1.area()>50000)
+			if (frame.cols == 0 || frame.rows == 0)
 			{
-				continue;
+				break;
 			}
-			std::cout << r1.area() << " ";
 
-			rects.push_back(r1);
-		}
-		std::cout << std::endl;
-		//***************************
+			//resize(frame, frame, Size(800, 600));//输入视频调整为800*800大小
+			cvtColor(frame, gray, CV_RGB2GRAY);//图像灰度化
+
+											   //二值化
+			cv::Mat img_binary = gray.clone();
+
+			//图像处理形态学计算
+			threshold(img_binary, img_binary, 240, 255, CV_THRESH_BINARY);
+			cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(16, 16));
+			morphologyEx(img_binary, img_binary, cv::MORPH_OPEN, element);
 
 
-		//
-		int max_dis = 999;
-		cv::Rect r(0, 0, 0, 0);
-		cv::Point P1, P2;
-		P1.x = frame.cols*0.5;
-		P1.y = frame.rows*0.5;
+			cv::Mat showbinary = img_binary.clone();
+			//cv::resize(showbinary, showbinary, cv::Size(800, 800));
 
-		for (int i = 0; i < rects.size(); i++)
-		{
-			P2.x = rects[i].x + 0.5*rects[i].width;
-			P2.y = rects[i].y + 0.5*rects[i].height;
+			//寻找合适的联通区域
+			std::vector<std::vector<cv::Point>> contours;
+			cv::findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
-			double distance;
-			distance = powf((P1.x - P2.x), 2) + powf((P1.y - P2.y), 2);
-			distance = sqrtf(distance);
+			int maxArea = 0;
+			cv::Rect r1;
+			CvBox2D r2;
 
-			if (distance < max_dis)
+			std::vector<cv::Rect> rects;
+			std::vector<cv::Rect> rects_all;
+			for (int i = 0; i < contours.size(); i++)
 			{
-				max_dis = distance;
-				r = rects[i];
-			}
-		}
-
-		int max_all = 0;
-		if (r.area() == 0)
-		{
-			for (int i = 0; i < rects_all.size(); i++)
-			{
-				if (rects_all[i].area()>max_all)
+				maxArea = contours[i].size();
+				r2 = cv::minAreaRect(contours[i]);
+				r1 = cv::boundingRect(contours[i]);
+				rects_all.push_back(r1);
+				if (r1.area() < 10000 || r1.area() > 50000)
 				{
-					max_all = rects_all[i].area();
-					r = rects_all[i];
+					continue;
+				}
+				std::cout << r1.area() << " ";
+
+				rects.push_back(r1);
+			}
+			std::cout << std::endl;
+			//***************************
+
+
+			//
+			int max_dis = 999;
+			cv::Rect r(0, 0, 0, 0);
+			cv::Point P1, P2;
+			P1.x = frame.cols*0.5;
+			P1.y = frame.rows*0.5;
+
+			for (int i = 0; i < rects.size(); i++)
+			{
+				P2.x = rects[i].x + 0.5*rects[i].width;
+				P2.y = rects[i].y + 0.5*rects[i].height;
+
+				double distance;
+				distance = powf((P1.x - P2.x), 2) + powf((P1.y - P2.y), 2);
+				distance = sqrtf(distance);
+
+				if (distance < max_dis)
+				{
+					max_dis = distance;
+					r = rects[i];
 				}
 			}
+
+			int max_all = 0;
+			if (r.area() == 0)
+			{
+				for (int i = 0; i < rects_all.size(); i++)
+				{
+					if (rects_all[i].area() > max_all)
+					{
+						max_all = rects_all[i].area();
+						r = rects_all[i];
+					}
+				}
+			}
+
+
+			//感兴趣区域扩展
+			if (r.area() == 0)
+			{
+				r = cv::Rect(0, 0, 639, 479);
+			}
+			else
+			{
+				/*r.x -= 10;
+				r.y -= 10;
+				r.width += 20;
+				r.height += 20;*/
+			}
+
+			std::vector<cv::Vec4f> lines_std;
+			lines_std.reserve(1000);
+			ls->detect(gray(r), lines_std);//这里把检测到的直线线段都存入了lines_std中，4个float的值，分别为起止点的坐标
+
+										   //去除干扰线段
+			findPrimaryAngle(lines_std);
+			//*****************************
+
+			cv::Mat drawImg = frame.clone();
+			cv::Mat drawImg2 = frame.clone();
+			//ls->drawSegments(drawImg, lines_std);
+			//imshow("2", drawImg);
+
+			std::vector<cv::Point> Points;
+			for (int i = 0; i < lines_std.size(); i++)
+			{
+				cv::Point p1, p2;
+				p1 = cv::Point(lines_std[i][0] + r.x, lines_std[i][1] + r.y);
+				p2 = cv::Point(lines_std[i][2] + r.x, lines_std[i][3] + r.y);
+
+				Points.push_back(p1);
+				Points.push_back(p2);
+			}
+
+			//条件滤波 暂时关闭
+			//selectPoints(Points);
+			//******************************
+
+			//画图
+			for (int i = 0; i < Points.size(); i++)
+			{
+				circle(drawImg2, Points[i], 5, Scalar(0, 0, 255), 2, 18);
+			}
+			//**********************
+
+			imshow("结果", drawImg2);
+			//可以控制视频的播放速度
+			cv::waitKey(10);
+
+			frame.release();
 		}
-
-
-		//感兴趣区域扩展
-		if (r.area() == 0)
-		{
-			r = cv::Rect(0, 0, 799, 799);
-		}
-		else
-		{
-			r.x -= 10;
-			r.y -= 10;
-			r.width += 20;
-			r.height += 20;
-		}
-
-		std::vector<cv::Vec4f> lines_std;
-		lines_std.reserve(1000);
-		ls->detect(gray(r), lines_std);//这里把检测到的直线线段都存入了lines_std中，4个float的值，分别为起止点的坐标
-
-									   //去除干扰线段
-		findPrimaryAngle(lines_std);
-		//*****************************
-
-		cv::Mat drawImg = frame.clone();
-		cv::Mat drawImg2 = frame.clone();
-		//ls->drawSegments(drawImg, lines_std);
-		//imshow("2", drawImg);
-
-		std::vector<cv::Point> Points;
-		for (int i = 0; i < lines_std.size(); i++)
-		{
-			cv::Point p1, p2;
-			p1 = cv::Point(lines_std[i][0] + r.x, lines_std[i][1] + r.y);
-			p2 = cv::Point(lines_std[i][2] + r.x, lines_std[i][3] + r.y);
-
-			Points.push_back(p1);
-			Points.push_back(p2);
-		}
-
-		//条件滤波 暂时关闭
-		//selectPoints(Points);
-		//******************************
-
-		//画图
-		for (int i = 0; i < Points.size(); i++)
-		{
-			circle(drawImg2, Points[i], 5, Scalar(0, 0, 255), 2, 18);
-		}
-		//**********************
-
-		imshow("结果", drawImg2);
-		//可以控制视频的播放速度
-		cv::waitKey(10);
-
-		frame.release();
 	}
+
+	cv::destroyWindow("image");
+
+	//OpenNI2 destroy  
+	oniColorStream.destroy();
+	device.close();
+	OpenNI::shutdown();
+
+	return 0;
 }
 
 bool SortFaster(sortType& dists, int Top_num)

@@ -1,23 +1,2 @@
-﻿  main.cpp
-d:\opencv\install\include\opencv2\core\mat.hpp(2586): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\opencv\install\include\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\opencv\install\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\opencv\install\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\opencv\install\include\opencv2\imgproc.hpp(592): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(86): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(106): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(107): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(111): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(112): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(115): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(116): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(120): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(169): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(170): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(202): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(237): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(245): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(251): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-e:\visual_servoing\fourpoints\fourpoints\main.cpp(286): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  fourpoints.vcxproj -> E:\visual_servoing\fourpoints\x64\Debug\fourpoints.exe
+﻿  fourpoints.vcxproj -> E:\visual_servoing\fourpoints\x64\Debug\fourpoints.exe
   fourpoints.vcxproj -> E:\visual_servoing\fourpoints\x64\Debug\fourpoints.pdb (Partial PDB)
