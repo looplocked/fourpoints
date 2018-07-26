@@ -1,6 +1,7 @@
 #include<opencv2\highgui.hpp>
 #include<iostream>
 #include "LineSegmentDetector.h"
+#include <opencv2/flann.hpp>
 using namespace std;
 using namespace cv;
 typedef std::vector<std::pair<double, int> > sortType;
@@ -23,6 +24,13 @@ int main(int argc, char** argv)
 		//可以cmd 输入路径
 		path = argv[1];
 	}
+
+	cvflann::StartStopTimer timer;
+	cvflann::StartStopTimer roitimer;
+	cvflann::StartStopTimer linedetectiontimer;
+	cvflann::StartStopTimer lineselectiontimer;
+	cvflann::StartStopTimer pointtimer;
+
 
 	//打开视频
 	VideoCapture m_capture;
@@ -51,8 +59,19 @@ int main(int argc, char** argv)
 
 	std::vector<cv::Point> prePoints = { Point(220, 140), Point(420, 140), Point(220, 340), Point(420, 340) };
 
+	double fps;
+	char fpstext[50];
+	string text;
+
+	string whole_time;
+	string roi_process_time;
+	string line_detect_time;
+	string line_select_time;
+	string point_process_time;
+
 	while (m_capture.grab())
 	{
+		timer.start();
 		count++;
 		m_capture >> frame;
 
@@ -61,6 +80,7 @@ int main(int argc, char** argv)
 			break;
 		}
 
+		roitimer.start();
 		resize(frame, frame, Size(640, 480));//输入视频调整为800*800大小
 		cvtColor(frame, gray, CV_RGB2GRAY);//图像灰度化
 
@@ -154,12 +174,26 @@ int main(int argc, char** argv)
 			r.height = r.y + r.height <= 460 ? r.height + 20 : 460 - r.y;
 		}
 
+		roitimer.stop();
+		roi_process_time = "ROI extract time is " + to_string(roitimer.value * 1000);
+		roitimer.reset();
+
+		linedetectiontimer.start();
 		std::vector<cv::Vec4f> lines_std;
 		lines_std.reserve(1000);
 		ls->detect(gray(r), lines_std);//这里把检测到的直线线段都存入了lines_std中，4个float的值，分别为起止点的坐标
+		linedetectiontimer.stop();
+		line_detect_time = "line detection time is " + to_string(linedetectiontimer.value * 1000);
+		linedetectiontimer.reset();
 
 									   //去除干扰线段
+		lineselectiontimer.start();
 		findPrimaryAngle(lines_std);
+		lineselectiontimer.stop();
+		line_select_time = "line selection time is " + to_string(lineselectiontimer.value * 1000);
+		lineselectiontimer.reset();
+		
+
 		//*****************************
 
 		cv::Mat drawImg = frame.clone();
@@ -167,6 +201,7 @@ int main(int argc, char** argv)
 		//ls->drawSegments(drawImg, lines_std);
 		//imshow("2", drawImg);
 
+		pointtimer.start();
 		std::vector<cv::Point> Points;
 		for (int i = 0; i < lines_std.size(); i++)
 		{
@@ -177,6 +212,8 @@ int main(int argc, char** argv)
 			Points.push_back(p1);
 			Points.push_back(p2);
 		}
+
+		enableClockWise(Points);
 
 		int index = 0;
 		double mindist = 1000;
@@ -191,6 +228,11 @@ int main(int argc, char** argv)
 		transPoints(Points, index);
 
 		std::vector<cv::Point> prePoints = Points;
+
+		pointtimer.stop();
+
+		point_process_time = "points selection time is " + to_string(pointtimer.value * 1000);
+		pointtimer.reset();
 
 		//条件滤波 暂时关闭
 		//selectPoints(Points);
@@ -215,6 +257,19 @@ int main(int argc, char** argv)
 		line(drawImg2, cv::Point(r.x, r.y+r.height), cv::Point(r.x, r.y), Scalar(0, 166, 0), 2, 8);
 		//**********************
 
+		timer.stop();
+		whole_time = "the whole time is " + to_string(timer.value * 1000);
+		fps = 1.0 / timer.value;
+		timer.reset();
+
+		sprintf(fpstext, "speed: %.0f fps", fps);
+		text = fpstext;
+		putText(drawImg2, text, Point(20, 10), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, whole_time, Point(20, 25), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, roi_process_time, Point(20, 40), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, line_detect_time, Point(20, 55), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, line_select_time, Point(20, 70), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, point_process_time, Point(20, 85), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
 		imshow("结果", drawImg2);
 		//可以控制视频的播放速度
 		cv::waitKey(10);

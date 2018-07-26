@@ -1,5 +1,6 @@
 #include<opencv2\highgui.hpp>
 #include<iostream>
+#include<opencv2\flann.hpp>
 #include "LineSegmentDetector.h"
 #include "OpenNI.h"
 using namespace std;
@@ -32,6 +33,12 @@ int main(int argc, char** argv)
 		path = argv[1];
 	}
 
+	cvflann::StartStopTimer timer;
+	cvflann::StartStopTimer roitimer;
+	cvflann::StartStopTimer linedetectiontimer;
+	cvflann::StartStopTimer lineselectiontimer;
+	cvflann::StartStopTimer pointtimer;
+
 	//打开视频
 	/*VideoCapture m_capture;
 	m_capture.open("cube1.mp4");
@@ -55,6 +62,7 @@ int main(int argc, char** argv)
 	int count = 0;
 	cv::Mat frame, mask, gray;
 	cv::Mat backframe;
+
 
 	Status result = STATUS_OK;
 
@@ -90,7 +98,18 @@ int main(int argc, char** argv)
 	// start color stream  
 	result = oniColorStream.start();
 
-	std::vector<cv::Point> prePoints = { Point(220, 140), Point(420, 140), Point(220, 340), Point(420, 340) };
+	
+	Point init_point(220, 140);
+
+	double fps;
+	char fpstext[50];
+	string text;
+
+	string whole_time;
+	string roi_process_time;
+	string line_detect_time;
+	string line_select_time;
+	string point_process_time;
 
 	while (key != 27)
 	{
@@ -104,7 +123,9 @@ int main(int argc, char** argv)
 		{
 			break;
 		}
-
+		
+		timer.start();
+		roitimer.start();
 		resize(frame, frame, Size(640, 480));//输入视频调整为800*800大小
 		cvtColor(frame, gray, CV_RGB2GRAY);//图像灰度化
 
@@ -201,13 +222,24 @@ int main(int argc, char** argv)
 			r.width = r.x + r.width <= 620 ? r.width + 20 : 640 - r.x;
 			r.height = r.y + r.height <= 460 ? r.height + 20 : 480 - r.y;
 		}
+		roitimer.stop();
+		roi_process_time = "ROI extract time is " + to_string(roitimer.value * 1000);
+		roitimer.reset();
 
+		linedetectiontimer.start();
 		std::vector<cv::Vec4f> lines_std;
 		lines_std.reserve(1000);
 		ls->detect(gray(r), lines_std);//这里把检测到的直线线段都存入了lines_std中，4个float的值，分别为起止点的坐标
+		linedetectiontimer.stop();
+		line_detect_time = "line detection time is " + to_string(linedetectiontimer.value * 1000);
+		linedetectiontimer.reset();
 
 									   //去除干扰线段
+		lineselectiontimer.start();
 		findPrimaryAngle(lines_std);
+		lineselectiontimer.stop();
+		line_select_time = "line selection time is " + to_string(lineselectiontimer.value * 1000);
+		lineselectiontimer.reset();
 		//*****************************
 
 		cv::Mat drawImg = frame.clone();
@@ -215,6 +247,7 @@ int main(int argc, char** argv)
 		//ls->drawSegments(drawImg, lines_std);
 		//imshow("2", drawImg);
 
+		pointtimer.start();
 		std::vector<cv::Point> Points;
 		for (int i = 0; i < lines_std.size(); i++)
 		{
@@ -231,16 +264,21 @@ int main(int argc, char** argv)
 		int index = 0;
 		double mindist = 1000;
 		for (int i = 0; i < 4; i++) {
-			double d = norm(prePoints[0] - Points[i]);
+			double d = norm(init_point - Points[i]);
 			if (d < mindist) {
 				index = i;
 				mindist = d;
 			}
 		}
 
-		transPoints(Points, index);
+		transPoints(Points, 4-index);
 		
-		std::vector<cv::Point> prePoints = Points;
+		init_point = Points[0];
+
+		pointtimer.stop();
+
+		point_process_time = "points selection time is " + to_string(pointtimer.value * 1000);
+		pointtimer.reset();
 
 		//条件滤波 暂时关闭
 		//selectPoints(Points);
@@ -265,6 +303,20 @@ int main(int argc, char** argv)
 		line(drawImg2, cv::Point(r.x + r.width, r.y), cv::Point(r.x + r.width, r.y + r.height), Scalar(0, 166, 0), 2, 8);
 		line(drawImg2, cv::Point(r.x + r.width, r.y + r.height), cv::Point(r.x, r.y + r.height), Scalar(0, 166, 0), 2, 8);
 		line(drawImg2, cv::Point(r.x, r.y + r.height), cv::Point(r.x, r.y), Scalar(0, 166, 0), 2, 8);
+
+		timer.stop();
+		whole_time = "the whole time is " + to_string(timer.value * 1000);
+		fps = 1.0 / timer.value;
+		timer.reset();
+
+		sprintf(fpstext, "speed: %.0f fps", fps);
+		text = fpstext;
+		putText(drawImg2, text, Point(20, 10), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, whole_time, Point(20, 25), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, roi_process_time, Point(20, 40), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, line_detect_time, Point(20, 55), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, line_select_time, Point(20, 70), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
+		putText(drawImg2, point_process_time, Point(20, 85), FONT_HERSHEY_PLAIN, 1, Scalar(0, 255, 255));
 		//**********************
 
 		imshow("结果", drawImg2);
@@ -297,7 +349,7 @@ void enableClockWise(std::vector<cv::Point>& Points)
 	if (vec1.x * vec2.y - vec1.y * vec2.x < 0) {
 		Point temp(Points[1].x, Points[1].y);
 		Points[1] = Points[3];
-		Points[3] = Points[1];
+		Points[3] = temp;
 	}
 }
 

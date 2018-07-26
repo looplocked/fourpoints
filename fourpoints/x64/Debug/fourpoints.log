@@ -1,11 +1,37 @@
-﻿Build started 2018/7/26 9:25:21.
+﻿Build started 2018/7/26 13:34:11.
      1>Project "E:\visualservoing\fourpoints\fourpoints\fourpoints.vcxproj" on node 2 (Build target(s)).
-     1>Link:
+     1>ClCompile:
+         D:\vs2015\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt main.cpp
+         main.cpp
+     1>d:\opencv\project\install\include\opencv2\core\mat.hpp(2586): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\opencv\project\install\include\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\opencv\project\install\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\opencv\project\install\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\opencv\project\install\include\opencv2\imgproc.hpp(592): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(156): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(176): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(177): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(181): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(182): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(185): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(186): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(190): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(255): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(256): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(290): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(291): warning C4101: 'baseline': unreferenced local variable
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(372): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(400): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(408): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(416): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(422): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+     1>e:\visualservoing\fourpoints\fourpoints\main.cpp(472): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+       Link:
          D:\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.exe" /INCREMENTAL /NOLOGO opencv_aruco320d.lib opencv_bgsegm320d.lib opencv_bioinspired320d.lib opencv_calib3d320d.lib opencv_ccalib320d.lib opencv_core320d.lib opencv_datasets320d.lib opencv_dnn320d.lib opencv_dpm320d.lib opencv_face320d.lib opencv_features2d320d.lib opencv_flann320d.lib opencv_fuzzy320d.lib opencv_highgui320d.lib opencv_imgcodecs320d.lib opencv_imgproc320d.lib opencv_line_descriptor320d.lib opencv_ml320d.lib opencv_objdetect320d.lib opencv_optflow320d.lib opencv_phase_unwrapping320d.lib opencv_photo320d.lib opencv_plot320d.lib opencv_reg320d.lib opencv_rgbd320d.lib opencv_saliency320d.lib opencv_shape320d.lib opencv_stereo320d.lib opencv_stitching320d.lib opencv_structured_light320d.lib opencv_superres320d.lib opencv_surface_matching320d.lib opencv_text320d.lib opencv_tracking320d.lib opencv_video320d.lib opencv_videoio320d.lib opencv_videostab320d.lib opencv_xfeatures2d320d.lib opencv_ximgproc320d.lib opencv_xobjdetect320d.lib opencv_xphoto320d.lib OpenNI2.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.lib" /MACHINE:X64 x64\Debug\LineSegmentDetector.obj
-         x64\Debug\Source.obj
+         x64\Debug\main.obj
          fourpoints.vcxproj -> E:\visualservoing\fourpoints\x64\Debug\fourpoints.exe
      1>Done Building Project "E:\visualservoing\fourpoints\fourpoints\fourpoints.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.54
+Time Elapsed 00:00:02.76
