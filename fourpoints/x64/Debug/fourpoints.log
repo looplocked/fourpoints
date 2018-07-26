@@ -1,2 +1,11 @@
-﻿  fourpoints.vcxproj -> E:\visual_servoing\fourpoints\x64\Debug\fourpoints.exe
-  fourpoints.vcxproj -> E:\visual_servoing\fourpoints\x64\Debug\fourpoints.pdb (Partial PDB)
+﻿Build started 2018/7/26 9:25:21.
+     1>Project "E:\visualservoing\fourpoints\fourpoints\fourpoints.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         D:\vs2015\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.exe" /INCREMENTAL /NOLOGO opencv_aruco320d.lib opencv_bgsegm320d.lib opencv_bioinspired320d.lib opencv_calib3d320d.lib opencv_ccalib320d.lib opencv_core320d.lib opencv_datasets320d.lib opencv_dnn320d.lib opencv_dpm320d.lib opencv_face320d.lib opencv_features2d320d.lib opencv_flann320d.lib opencv_fuzzy320d.lib opencv_highgui320d.lib opencv_imgcodecs320d.lib opencv_imgproc320d.lib opencv_line_descriptor320d.lib opencv_ml320d.lib opencv_objdetect320d.lib opencv_optflow320d.lib opencv_phase_unwrapping320d.lib opencv_photo320d.lib opencv_plot320d.lib opencv_reg320d.lib opencv_rgbd320d.lib opencv_saliency320d.lib opencv_shape320d.lib opencv_stereo320d.lib opencv_stitching320d.lib opencv_structured_light320d.lib opencv_superres320d.lib opencv_surface_matching320d.lib opencv_text320d.lib opencv_tracking320d.lib opencv_video320d.lib opencv_videoio320d.lib opencv_videostab320d.lib opencv_xfeatures2d320d.lib opencv_ximgproc320d.lib opencv_xobjdetect320d.lib opencv_xphoto320d.lib OpenNI2.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\visualservoing\fourpoints\x64\Debug\fourpoints.lib" /MACHINE:X64 x64\Debug\LineSegmentDetector.obj
+         x64\Debug\Source.obj
+         fourpoints.vcxproj -> E:\visualservoing\fourpoints\x64\Debug\fourpoints.exe
+     1>Done Building Project "E:\visualservoing\fourpoints\fourpoints\fourpoints.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.54
